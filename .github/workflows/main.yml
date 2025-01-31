@@ -1,0 +1,31 @@
+name: Convert Rules
+
+on:
+  schedule:
+    - cron: "0 0 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  convert_file:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Pull Docker image
+        run: docker pull ghcr.io/sagernet/sing-box:v1.11.0
+
+      - name: Download AdGuard filter file
+        run: |
+          curl -o adguard.txt https://raw.githubusercontent.com/ppfeufer/adguard-filter-list/refs/heads/master/blocklist
+
+      - name: Convert file
+        run: |
+          docker run -v $(pwd):/data ghcr.io/sagernet/sing-box:v1.11.0 \
+            rule-set convert --type adguard /data/adguard.txt
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          files: |
+            *.srs
