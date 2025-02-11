@@ -16,12 +16,12 @@ jobs:
 
       - name: Download AdGuard filter file
         run: |
-          curl -o adguard.txt https://raw.githubusercontent.com/ppfeufer/adguard-filter-list/refs/heads/master/blocklist
+          curl -o reject.json https://ruleset.skk.moe/sing-box/domainset/reject.json
 
       - name: Convert file
         run: |
           docker run -v $(pwd):/data ghcr.io/sagernet/sing-box:v1.11.0 \
-            rule-set convert --type adguard /data/adguard.txt
+            rule-set compile /data/reject.json
 
       - name: Create release
         uses: softprops/action-gh-release@v2
